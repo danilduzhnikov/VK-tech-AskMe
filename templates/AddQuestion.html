@@ -1,0 +1,32 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block title %}
+    <title>Ask</title>
+{% endblock %}
+
+{% block content_name %}
+    <h1>New Question</h1>
+{% endblock %}
+
+{% block content %}
+    <div class="col-9 d-flex flex-column gap-2" style="height: 70vh;">
+                <form action="#" method="POST" class="d-flex flex-column gap-2 h-100">
+                    <div class="input-group flex-nowrap flex-grow-3">
+                        <span class="input-group-text bg-light d-flex align-items-start" id="addon-wrapping-title">Title</span>
+                        <textarea class="form-control" name="title" placeholder="Title" aria-label="Title" aria-describedby="addon-wrapping-title"></textarea>
+                    </div>
+                    <div class="input-group flex-nowrap flex-grow-1">
+                        <span class="input-group-text bg-light d-flex align-items-start" id="addon-wrapping-text">Text</span>
+                        <textarea class="form-control" name="text" placeholder="Some text" aria-label="Text" aria-describedby="addon-wrapping-text"></textarea>
+                    </div>
+                    <div class="input-group flex-nowrap flex-grow-3">
+                        <span class="input-group-text bg-light d-flex align-items-start" id="addon-wrapping-tags">Tags</span>
+                        <textarea class="form-control" name="tags" placeholder="Tags" rows="3" aria-label="Tags" aria-describedby="addon-wrapping-tags"></textarea>
+                    </div>
+                    <div>
+                        <button class="btn btn-outline-success" type="submit">Ask</button>
+                    </div>
+                </form>
+            </div>
+{% endblock %}

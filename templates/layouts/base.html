@@ -1,0 +1,88 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    {% block title %}
+    {% endblock %}
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        textarea {
+            resize: none;
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-light" style="background-color: #a7bc98">
+    <div class="container-fluid">
+        <div class="d-flex w-100 justify-content-between align-items-center">
+            <a class="navbar-brand" href=" {% url 'QuestionsList' %} ">AskPupkin</a>
+            <form class="form-inline my-2 my-lg-0 d-flex gap-1">
+                <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Ask</button>
+            </form>
+            <div class="d-flex gap-1 ">
+                <img src="{% static '/pictures/cat.jpeg' %}" alt="Avatar" class="img-thumbnail"
+                     style="width: 50px; height: 50px; padding: 0">
+                <div>
+                    <div>
+                        dr pepper
+                    </div>
+                    <a href=" {% url 'Settings' %} ">settings</a>
+                    <a href="#">log out</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+<main class="container mt-5">
+    {% block content_name %}
+    {% endblock %}
+    <div class="row mt-5">
+        {% block content %}
+        {% endblock %}
+        <div class="col">
+            <section class="mb-3">
+                <h2>Popular Tags</h2>
+                <div>
+                    <span class="badge bg-primary">Primary</span>
+                    <span class="badge bg-secondary">Secondary</span>
+                    <span class="badge bg-success">Success</span>
+                    <span class="badge bg-danger">Danger</span>
+                    <span class="badge bg-warning text-dark">Warning</span>
+                    <span class="badge bg-info text-dark">Info</span>
+                    <span class="badge bg-light text-dark">Light</span>
+                    <span class="badge bg-dark">Dark</span>
+                </div>
+            </section>
+            <section>
+                <h2>Best Members</h2>
+                <div>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item"><a href="#">Member</a></li>
+                        <li class="list-group-item"><a href="#">Member</a></li>
+                        <li class="list-group-item"><a href="#">Member</a></li>
+                        <li class="list-group-item"><a href="#">Member</a></li>
+                        <li class="list-group-item"><a href="#">Member</a></li>
+                    </ul>
+                </div>
+            </section>
+        </div>
+    </div>
+</main>
+<script src="{% static 'js/bootstrap.min.js' %}">
+    function displayFilePath() {
+        const fileInput = document.getElementById("file-upload");
+        const filePath = document.getElementById("file-path");
+        filePath.value = fileInput.files[0]?.name || ""; // Отображает только имя файла
+    }
+</script>
+</body>

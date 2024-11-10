@@ -1,0 +1,28 @@
+{% load static %}
+
+<div class="row">
+    <div class="col-3 d-flex flex-column">
+        <div class="border mb-2" style="height: 100px">
+            <img src="jpg.jpg" alt="Avatar" class="img-fluid">
+        </div>
+        <input type="number" class="form-control" style="width: 100%;" value="5"
+               placeholder="Default input" aria-label="default-input-example">
+    </div>
+    <div class="col-9 d-flex flex-column gap-2">
+        <a href="{% url 'QuestionSingle' question.id %}">
+            <h5>{{ question.title }}</h5>
+        </a>
+        <p class="card-text">{{ question.text }}
+        </p>
+        <div class="d-flex gap-5">
+            <div>
+
+                Tags:
+
+                <a href="#" class="card-link">black-jack</a>
+                <a href="#" class="card-link">bender</a>
+            </div>
+        </div>
+    </div>
+</div>
+<hr>
