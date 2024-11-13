@@ -3,7 +3,9 @@ import copy
 from django.core.paginator import Paginator
 from django.shortcuts import render
 
+from app.models import Tag
 from .logic.pagination import paginations_params
+
 QUESTIONS = [
     {
         "title": "title" + str(i),
@@ -12,6 +14,8 @@ QUESTIONS = [
     } for i in range(30)
 ]
 
+TAGS = Tag.objects.get_popular()
+
 HOTQUESTIONS = copy.deepcopy(QUESTIONS)
 HOTQUESTIONS.reverse()
 
@@ -19,17 +23,20 @@ HOTQUESTIONS.reverse()
 def Login(request):
     return render(request,
                   'Login.html',
-                  context={'questions': QUESTIONS})
+                  context={'questions': QUESTIONS,
+                           'tags': TAGS})
 
 def Register(request):
     return render(request,
                   'Register.html',
-                  context={'questions': QUESTIONS})
+                  context={'questions': QUESTIONS,
+                           'tags': TAGS})
 
 def Settings(request):
     return render(request,
                   'Settings.html',
-                  context={'questions': QUESTIONS})
+                  context={'questions': QUESTIONS,
+                           'tags': TAGS})
 
 def QuestionsList(request):
 
@@ -44,23 +51,27 @@ def QuestionsList(request):
                   context={'questions': page.object_list,
                            'page_obj': page,
                            'paginator': paginator,
-                           'params': params}
+                           'params': params,
+                           'tags': TAGS}
                   )
 
 def QuestionSingle(request, question_id):
     return render(request,
                   'QuestionSingle.html',
-                  context={'question': QUESTIONS[question_id]})
+                  context={'question': QUESTIONS[question_id],
+                           'tags': TAGS})
 
 def TagsList(request):
     return render(request,
                   'TagsList.html',
-                  context={'questions': QUESTIONS})
+                  context={'questions': QUESTIONS,
+                           'tags': TAGS})
 
 def AddQuestion(request):
     return render(request,
                   'AddQuestion.html',
-                  context={'questions': QUESTIONS})
+                  context={'questions': QUESTIONS,
+                           'tags': TAGS})
 
 def HotQuestions(request):
 
@@ -75,5 +86,6 @@ def HotQuestions(request):
                   context={'questions': page.object_list,
                            'page_obj': page,
                            'paginator': paginator,
-                           'params': params}
+                           'params': params,
+                           'tags': TAGS}
                   )
