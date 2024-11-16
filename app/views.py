@@ -1,91 +1,62 @@
 import copy
 
-from django.core.paginator import Paginator
 from django.shortcuts import render
+from app.utils import paginations_params, question_tags
 
-from app.models import Tag
-from .logic.pagination import paginations_params
+from app.models import Tag, Question
 
-QUESTIONS = [
-    {
-        "title": "title" + str(i),
-        "id": str(i),
-        "text": "text" + str(i),
-    } for i in range(30)
-]
+QUESTIONS = Question.objects.get_new_questions()
 
-TAGS = Tag.objects.get_popular()
+POPULAR_TAGS = Tag.objects.get_popular()
 
-HOTQUESTIONS = copy.deepcopy(QUESTIONS)
-HOTQUESTIONS.reverse()
+HOTQUESTIONS = Question.objects.get_hot_questions()
 
 # Create your views here.
 def Login(request):
     return render(request,
                   'Login.html',
-                  context={'questions': QUESTIONS,
-                           'tags': TAGS})
+                  context={'questions': QUESTIONS})
 
 def Register(request):
     return render(request,
                   'Register.html',
-                  context={'questions': QUESTIONS,
-                           'tags': TAGS})
+                  context={'questions': QUESTIONS})
 
 def Settings(request):
     return render(request,
                   'Settings.html',
-                  context={'questions': QUESTIONS,
-                           'tags': TAGS})
+                  context={'questions': QUESTIONS})
 
 def QuestionsList(request):
-
-    page_num = int(request.GET.get('page', 1))
-    paginator = Paginator(QUESTIONS, 5)
-    page = paginator.page(page_num)
-
-    # вывел монотонную логику отображения пагинатора
-    params = paginations_params(page_num, paginator, page)
+    pagination = paginations_params(request, QUESTIONS, 6)
     return render(request,
                   'QuestionsList.html',
-                  context={'questions': page.object_list,
-                           'page_obj': page,
-                           'paginator': paginator,
-                           'params': params,
-                           'tags': TAGS}
+                  context={'questions': pagination.get("page_objects"),     # Input data for question layout
+                           'pagination_params': pagination.get("params")}                    # Top popular_tags for base layout
                   )
 
 def QuestionSingle(request, question_id):
+    question = Question.objects.get(id=question_id)
+    tags = question_tags(question)
     return render(request,
                   'QuestionSingle.html',
-                  context={'question': QUESTIONS[question_id],
-                           'tags': TAGS})
+                  context={'question': question,
+                           'tags': tags})
 
 def TagsList(request):
     return render(request,
                   'TagsList.html',
-                  context={'questions': QUESTIONS,
-                           'tags': TAGS})
+                  context={'questions': QUESTIONS})
 
 def AddQuestion(request):
     return render(request,
                   'AddQuestion.html',
-                  context={'questions': QUESTIONS,
-                           'tags': TAGS})
+                  context={'questions': QUESTIONS})
 
 def HotQuestions(request):
-
-    page_num = int(request.GET.get('page', 1))
-    paginator = Paginator(HOTQUESTIONS, 5)
-    page = paginator.page(page_num)
-
-    # вывел монотонную логику отображения пагинатора
-    params = paginations_params(page_num, paginator, page)
+    pagination = paginations_params(request, HOTQUESTIONS, 6)
     return render(request,
                   'HotQuestions.html',
-                  context={'questions': page.object_list,
-                           'page_obj': page,
-                           'paginator': paginator,
-                           'params': params,
-                           'tags': TAGS}
+                  context={'questions': pagination.get("page_objects"),     # Input data for question layout
+                           'pagination_params': pagination.get("params")}   # Parameters for pagination layout
                   )

@@ -1,53 +1,59 @@
 <ul class="pagination">
-    {% if params.left_switch %}
-        <li class="page-item">
-            <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
-                <span aria-hidden="true">&laquo;</span>
-            </a>
-        </li>
-    {% else %}
-        <li class="page-item">
-            <a class="page-link" style="cursor: pointer;" aria-label="Previous" onclick="return false;">
-                <span aria-hidden="true">&laquo;</span>
-            </a>
-        </li>
-    {% endif %}
-    {# Обещаю перепишу по-нормальному #}
-    {% if params.is_first_page %}
-        <li class="page-item"><a class="page-link"
-                                 href="?page={{ page_obj.number }}">{{ page_obj.number }}</a></li>
-        <li class="page-item"><a class="page-link"
-                                 href="?page={{ page_obj.next_page_number }}">{{ page_obj.next_page_number }}</a></li>
-        <li class="page-item"><a class="page-link"
-                                 href="?page={{ params.two_pages_ahead }}">{{ params.two_pages_ahead }}</a></li>
-    {% elif params.is_last_page %}
-        <li class="page-item"><a class="page-link"
-                                 href="?page={{ params.two_pages_behind }}">{{ params.two_pages_behind }}</a></li>
-        <li class="page-item"><a class="page-link"
-                                 href="?page={{ page_obj.previous_page_number }}">{{ page_obj.previous_page_number }}</a></li>
-        <li class="page-item"><a class="page-link"
-                                 href="?page={{ page_obj.number }}">{{ page_obj.number }}</a></li>
-    {% else %}
-        <li class="page-item"><a class="page-link"
-                                 href="?page={{ page_obj.previous_page_number }}">{{ page_obj.previous_page_number }}</a></li>
-        <li class="page-item"><a class="page-link"
-                                 href="?page={{ page_obj.number }}">{{ page_obj.number }}</a></li>
-        <li class="page-item"><a class="page-link"
-                                 href="?page={{ page_obj.next_page_number }}">{{ page_obj.next_page_number }}</a></li>
-    {% endif %}
+    {% with page=pagination_params.page_obj params=pagination_params %}
 
+        <!-- Стрелка назад -->
+        {% if params.left_switch %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page.previous_page_number }}" aria-label="Previous">
+                    <span aria-hidden="true">«</span>
+                </a>
+            </li>
+        {% else %}
+            <li class="page-item">
+                <a class="page-link" style="cursor: pointer;" aria-label="Previous" onclick="return false;">
+                    <span aria-hidden="true">«</span>
+                </a>
+            </li>
+        {% endif %}
 
-    {% if params.right_switch %}
-        <li class="page-item">
-            <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">
-                <span aria-hidden="true">&raquo;</span>
-            </a>
-        </li>
-    {% else %}
-        <li class="page-item">
-            <a class="page-link" style="cursor: pointer;" aria-label="Next" onclick="return false;">
-                <span aria-hidden="true">&raquo;</span>
-            </a>
-        </li>
-    {% endif %}
+        <!-- Положение конвейера страниц -->
+        {% if page.number == 1 %}
+            <li class="page-item"><a class="page-link"
+                                     href="?page={{ page.number }}">{{ page.number }}</a></li>
+            <li class="page-item"><a class="page-link"
+                                     href="?page={{ page.next_page_number }}">{{ page.next_page_number }}</a></li>
+            <li class="page-item"><a class="page-link"
+                                     href="?page={{ params.two_pages_ahead }}">{{ params.two_pages_ahead }}</a></li>
+        {% elif page.number == params.paginator.num_pages %}
+            <li class="page-item"><a class="page-link"
+                                     href="?page={{ params.two_pages_behind }}">{{ params.two_pages_behind }}</a></li>
+            <li class="page-item"><a class="page-link"
+                                     href="?page={{ page.previous_page_number }}">{{ page.previous_page_number }}</a></li>
+            <li class="page-item"><a class="page-link"
+                                     href="?page={{ page.number }}">{{ page.number }}</a></li>
+        {% else %}
+            <li class="page-item"><a class="page-link"
+                                     href="?page={{ page.previous_page_number }}">{{ page.previous_page_number }}</a></li>
+            <li class="page-item"><a class="page-link"
+                                     href="?page={{ page.number }}">{{ page.number }}</a></li>
+            <li class="page-item"><a class="page-link"
+                                     href="?page={{ page.next_page_number }}">{{ page.next_page_number }}</a></li>
+        {% endif %}
+
+        <!-- Стрелка вперед -->
+        {% if params.right_switch %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page.next_page_number }}" aria-label="Next">
+                    <span aria-hidden="true">»</span>
+                </a>
+            </li>
+        {% else %}
+            <li class="page-item">
+                <a class="page-link" style="cursor: pointer;" aria-label="Next" onclick="return false;">
+                    <span aria-hidden="true">»</span>
+                </a>
+            </li>
+        {% endif %}
+
+    {% endwith %}
 </ul>

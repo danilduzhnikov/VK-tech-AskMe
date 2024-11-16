@@ -51,7 +51,8 @@ class Command(BaseCommand):
                 author=choice(User.objects.all()),
                 tag=choice(Tag.objects.all()),
                 title=fake.sentence(),
-                text=fake.paragraph(nb_sentences=5)
+                text=fake.paragraph(nb_sentences=5),
+                views=randint(0, 1000),
             ) for _ in range(num_Question)
         ]
         Question.objects.bulk_create(Questions)
