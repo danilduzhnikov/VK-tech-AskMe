@@ -1,7 +1,11 @@
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from app.models import QuestionTag, Tag, Question
 
-def paginations_params(request, content, count):
+from collections import defaultdict
+from django.db.models.query import QuerySet
+
+# Стартовые свойства пагинатора
+def paginators_params(request, content, count):
     page_num = request.GET.get('page', 1)
     paginator = Paginator(content, count)
 
@@ -11,6 +15,12 @@ def paginations_params(request, content, count):
         page = paginator.page(1)
     except EmptyPage:
         page = paginator.page(paginator.num_pages)
+
+    return page, paginator
+
+# кастыльная пагинация
+def paginations_params(request, content, count):
+    page, paginator = paginators_params(request, content, count)
 
     two_pages_ahead = page.number + 2
     two_pages_behind = page.number - 2
@@ -49,6 +59,34 @@ def paginations_params(request, content, count):
         'paginator': paginator
     }
 
-def question_tags(question):
-    tags = QuestionTag.objects.filter(question=question)
-    return Tag.objects.filter(id__in=tags)
+def questions_list_tags(questions):
+    question_tags = []
+    # questions несколько
+    try:
+        for question in questions:
+            # Получаем все записи QuestionTag, где question_id совпадает с переданным значением
+            question_tag_records = QuestionTag.objects.filter(question_id=question.id)
+
+            # Извлекаем уникальные теги из этих записей
+            tags = Tag.objects.filter(id__in=[record.tag_id for record in question_tag_records])
+
+            question_tags.append(
+                {
+                    'question': question,
+                    'tags': tags
+                }
+            )
+    # questions один
+    except:
+        # Получаем все записи QuestionTag, где question_id совпадает с переданным значением
+        question_tag_records = QuestionTag.objects.filter(question_id=questions.id)
+
+        # Извлекаем уникальные теги из этих записей
+        tags = Tag.objects.filter(id__in=[record.tag_id for record in question_tag_records])
+        question_tags.append(
+            {
+                'question': questions,
+                'tags': tags
+            }
+        )
+    return question_tags

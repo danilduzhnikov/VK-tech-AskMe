@@ -20,9 +20,6 @@ class QuestionManager(Generic[T], models.Manager):
     def get_hot_questions(self):
         return self.order_by('-views')
 
-    def get_question(self, question_id):
-        return self.get(id=question_id)
-
 class QuestionLikeManager(Generic[T], models.Manager):
     def get_count_likes_question(self, question_id: int) -> int:
         likes = self.filter(question=question_id)
@@ -63,7 +60,6 @@ class Tag(models.Model):
 
 class Question(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
-    tag = models.ForeignKey(Tag, on_delete=models.SET_NULL, null=True, blank=True)
     title = models.CharField(max_length=100)
     text = models.TextField()
     views = models.IntegerField(default=0)
@@ -80,6 +76,9 @@ class QuestionTag(models.Model):
     tag = models.ForeignKey(Tag, on_delete=models.CASCADE)
 
     objects = QuestionTagManager()
+
+    def __str__(self):
+        return f"question {self.question.id} + tag {self.tag.id}"
 
 class Answer(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)

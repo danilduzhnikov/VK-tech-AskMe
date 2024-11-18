@@ -1,7 +1,7 @@
 import copy
 
 from django.shortcuts import render
-from app.utils import paginations_params, question_tags
+from app.utils import paginations_params, questions_list_tags
 
 from app.models import Tag, Question
 
@@ -28,20 +28,22 @@ def Settings(request):
                   context={'questions': QUESTIONS})
 
 def QuestionsList(request):
-    pagination = paginations_params(request, QUESTIONS, 6)
+    pagination = paginations_params(request, QUESTIONS, 5)
+    questions = pagination.get("page_objects")
+    questions_tags = questions_list_tags(questions)
     return render(request,
                   'QuestionsList.html',
-                  context={'questions': pagination.get("page_objects"),     # Input data for question layout
-                           'pagination_params': pagination.get("params")}                    # Top popular_tags for base layout
+                  context={'pagination_params': pagination.get("params"),
+                           'questions_tags': questions_tags}
                   )
 
 def QuestionSingle(request, question_id):
     question = Question.objects.get(id=question_id)
-    tags = question_tags(question)
+    questions_tags = questions_list_tags(question)
     return render(request,
                   'QuestionSingle.html',
                   context={'question': question,
-                           'tags': tags})
+                           'questions_tags': questions_tags})
 
 def TagsList(request):
     return render(request,

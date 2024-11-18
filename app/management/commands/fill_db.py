@@ -3,7 +3,7 @@ from random import choice, randint
 from faker import Faker
 from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
-from app.models import Profile, Tag, Question, Answer, QuestionLike, AnswerLike
+from app.models import Profile, Tag, Question, Answer, QuestionLike, AnswerLike, QuestionTag
 
 fake = Faker()
 
@@ -49,7 +49,6 @@ class Command(BaseCommand):
         Questions = [
             Question(
                 author=choice(User.objects.all()),
-                tag=choice(Tag.objects.all()),
                 title=fake.sentence(),
                 text=fake.paragraph(nb_sentences=5),
                 views=randint(0, 1000),
@@ -57,6 +56,15 @@ class Command(BaseCommand):
         ]
         Question.objects.bulk_create(Questions)
         self.stdout.write(f"Создано {num_Question} вопросов.")
+
+        # Генерация связи многих ко многим QuestionTag
+        QuestionTags = [
+            QuestionTag(
+                question=choice(Question.objects.all()),
+                tag=choice(Tag.objects.all())
+            ) for _ in range(num_Question * 10)
+        ]
+        QuestionTag.objects.bulk_create(QuestionTags)
 
         # Генерация ответов
         num_Answer = ratio * 100

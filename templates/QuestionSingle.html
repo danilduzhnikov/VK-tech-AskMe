@@ -7,7 +7,9 @@
 
 {% block content %}
     <div class="col-9" style="height: 70vh;">
-        {% include 'layouts/question.html' %}
+        {% for item in questions_tags %}
+            {% include 'layouts/question.html' %}
+        {% endfor %}
         <div>
             <div class="card w-100" style="width: 18rem;">
                 <div class="card-body">
