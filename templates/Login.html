@@ -1,5 +1,6 @@
 {% extends 'layouts/base.html' %}
 {% load static %}
+{% load bootstrap5 %}
 
 {% block title %}
     <title>Login</title>
@@ -13,36 +14,12 @@
     <div class="col-9">
         <div class="row mt-4">
             <div class="col-9 d-flex flex-column gap-2" style="height: 70vh;">
-                <h5 style="color: red;">Sorry, wrong password!</h5>
-                <form action="#" method="POST" class="d-flex flex-column gap-2 h-100">
-                    <div class="row align-items-center">
-                        <div class="col-3 w-30">
-                            Login
-                        </div>
-                        <div class="col-9 w-50">
-                            <input class="form-control mr-sm-2" type="Login" placeholder="Enter your login here"
-                                   aria-label="Login">
-                        </div>
-                    </div>
-                    <div class="row align-items-center mt-2">
-                        <div class="col-3 w-30">
-                            Password
-                        </div>
-                        <div class="col-9 w-50">
-                            <input class="form-control mr-sm-2" type="Password" placeholder="******"
-                                   aria-label="Password">
-
-                        </div>
-                    </div>
-                    <div class="row align-items-center mt-2">
-                        <div class="col-3"></div>
-                        <div class="col-9 d-flex flex-column w-50">
-                            <button class="btn btn-outline-primary my-2 my-sm-0" type="submit">Log in!</button>
-                            <a href="#" class="mt-1">
-                                create new account
-                            </a>
-                        </div>
-                    </div>
+                <form action="" method="POST" class="d-flex flex-column gap-2 h-100">
+                    {% csrf_token %}
+                    {% bootstrap_form form%}
+                    {% buttons %}
+                        <button class="btn btn-outline-primary my-2 my-sm-0" type="submit">Log in!</button>
+                    {% endbuttons %}
                 </form>
             </div>
         </div>

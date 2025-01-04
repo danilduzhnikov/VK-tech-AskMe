@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    'app'
+    'app',
+    'bootstrap5'
 ]
 
 MIDDLEWARE = [
@@ -127,6 +128,15 @@ STATIC_URL = 'static/'
 
 STATICFILES_DIRS = [
     BASE_DIR / "static",
+]
+
+LOGIN_URL = '/login'
+
+AUTH_USER_MODEL = 'app.CustomUser'
+
+AUTHENTICATION_BACKENDS = [
+    'askme_duzhnikov.authentication.CustomLoginBackend',
+    'django.contrib.auth.backends.ModelBackend',
 ]
 
 # Default primary key field type

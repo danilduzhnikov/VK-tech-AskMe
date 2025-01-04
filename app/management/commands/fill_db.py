@@ -2,11 +2,11 @@ from typing import Optional
 from random import choice, randint
 from faker import Faker
 from django.core.management.base import BaseCommand
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from app.models import Profile, Tag, Question, Answer, QuestionLike, AnswerLike, QuestionTag
 
 fake = Faker()
-
+User = get_user_model()
 
 class Command(BaseCommand):
     help = "Заполняет базу данных тестовыми данными"
@@ -26,23 +26,39 @@ class Command(BaseCommand):
 
         # Генерация пользователей
         num_users = ratio
-        users = [User(username=fake.user_name(), email=fake.email()) for _ in range(num_users)]
-        User.objects.bulk_create(users, ignore_conflicts=True)
-        self.stdout.write(f"Создано {num_users} пользователей.")
+        existing_usernames = set(User.objects.values_list('username', flat=True))
 
-        # Создаем профили
+        # Фильтруем уникальных пользователей
+        new_users = [
+            User(login=fake.user_name(), username=fake.user_name(), email=fake.email())
+            for _ in range(num_users)
+            if fake.user_name() not in existing_usernames
+        ]
+
+        User.objects.bulk_create(new_users, ignore_conflicts=True)
+
+        # Фактически созданные пользователи
+        created_users = User.objects.exclude(profile__isnull=False)  # Пользователи без профилей
+        self.stdout.write(f"Создано {created_users.count()} пользователей.")
+
+        # Создаем профили только для этих пользователей
         user_Profile = [
             Profile(user=user, description=fake.text(max_nb_chars=50))
-            for user in User.objects.filter(profile__isnull=True)  # отфильтровываем пользователей без профиля
+            for user in created_users
         ]
         Profile.objects.bulk_create(user_Profile)
         self.stdout.write(f"Создано {len(user_Profile)} профилей пользователей.")
 
         # Генерация тегов
         num_Tag = ratio
-        tag = [Tag(name=fake.word(), views=randint(0, 1000)) for _ in range(num_Tag)]
-        Tag.objects.bulk_create(tag)
-        self.stdout.write(f"Создано {num_Tag} тегов.")
+        existing_tags = set(Tag.objects.values_list('name', flat=True))
+        new_tags = [
+            Tag(name=fake.word(), views=randint(0, 1000))
+            for _ in range(num_Tag)
+            if fake.word() not in existing_tags
+        ]
+        Tag.objects.bulk_create(new_tags)
+        self.stdout.write(f"Создано {len(new_tags)} новых тегов.")
 
         # Генерация вопросов
         num_Question = ratio * 10

@@ -1,8 +1,10 @@
-from django.contrib.auth.models import User
 from django.db import models
+from django.contrib.auth.models import AbstractUser
 from django.db.models.query import QuerySet
 
-from typing import TypeVar, Generic, Type
+from typing import TypeVar, Generic
+
+from django.conf import settings
 
 T = TypeVar('T')
 
@@ -38,8 +40,20 @@ class QuestionTagManager(Generic[T], models.Manager):
     def get_question_tags(self, question_id):
         return self.filter(question=question_id)
 
+    def get_questions_per_tag(self, tag:str) -> QuerySet[T]:
+        return Question.objects.filter(
+            questiontag__tag__name=tag
+        ).distinct()
+
+class CustomUser(AbstractUser):
+    login = models.CharField(max_length=150, unique=True)
+
+    def __str__(self):
+        return self.username
+
+
 class Profile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     avatar = models.ImageField(upload_to='avatars/', null=True, blank=True)
     description = models.CharField(max_length=100, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -59,7 +73,7 @@ class Tag(models.Model):
         return self.name
 
 class Question(models.Model):
-    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     title = models.CharField(max_length=100)
     text = models.TextField()
     views = models.IntegerField(default=0)
@@ -82,7 +96,7 @@ class QuestionTag(models.Model):
 
 class Answer(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
-    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     text = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -94,7 +108,7 @@ class Answer(models.Model):
 
 
 class AnswerLike(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     answer = models.ForeignKey(Answer, on_delete=models.CASCADE)
 
     objects = AnswerLikeManager()
@@ -103,7 +117,7 @@ class AnswerLike(models.Model):
         unique_together = ('user', 'answer')
 
 class QuestionLike(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
 
     objects = QuestionLikeManager()
