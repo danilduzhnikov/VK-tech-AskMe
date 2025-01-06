@@ -4,8 +4,8 @@ from django.contrib import auth
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 
-from app.forms import LoginForm, RegisterForm
-from app.utils import paginations_params, questions_list_tags
+from app.forms import LoginForm, RegisterForm, AddQuestionForm, AddAnswerForm
+from app.utils import paginations_params, get_tags_per_question
 
 from app.models import Tag, Question, QuestionTag
 
@@ -22,9 +22,9 @@ def Login(request):
     if request.method == 'POST':
         form = LoginForm(request.POST)
         if form.is_valid():
-            login = form.cleaned_data['login']
-            password = form.cleaned_data['password']
-            user = auth.authenticate(request, login=login, password=password)
+            user = auth.authenticate(request,
+                                     login=form.cleaned_data['login'],
+                                     password=form.cleaned_data['password'])
             if user:
                 auth.login(request, user)
                 return redirect('QuestionsList')
@@ -62,7 +62,7 @@ def QuestionsList(request):
     data = QUESTIONS
     pagination = paginations_params(request, data, 5)
     page_objects = pagination.get("page_objects")
-    questions = questions_list_tags(page_objects)
+    questions = get_tags_per_question(page_objects)
     return render(request,
                   'QuestionsList.html',
                   context={'pagination_params': pagination.get("params"),
@@ -72,32 +72,56 @@ def HotQuestions(request):
     data = HOTQUESTIONS
     pagination = paginations_params(request, data, 5)
     page_objects = pagination.get("page_objects")
-    questions = questions_list_tags(page_objects)
+    questions = get_tags_per_question(page_objects)
     return render(request,
                   'HotQuestions.html',
                   context={'pagination_params': pagination.get("params"),
                            'questions': questions}
                   )
 def QuestionSingle(request, question_id):
-    question = Question.objects.get(id=question_id)
-    questions_tags = questions_list_tags(question)
+    question_single = Question.objects.get(id=question_id)
+    answers = question_single.answer_set.all()
+
+    pagination = paginations_params(request, answers, 2)
+    page_objects = pagination.get("page_objects")
+    questions = get_tags_per_question(question_single)
+
+    if request.method == "POST":
+        if request.user.is_authenticated:
+            form = AddAnswerForm(request.POST)
+            if form.is_valid():
+                form.save(author=request.user, question=question_single)
+                return redirect('QuestionSingle', question_id=question_id)
+        else:
+            return redirect('Login')
+    else:
+        form = AddAnswerForm()
+
     return render(request,
                   'QuestionSingle.html',
-                  context={'question': question,
-                           'questions_tags': questions_tags})
+                  context={'pagination_params': pagination.get("params"),
+                           'answers': page_objects,
+                           'questions': questions,  # Single question in list
+                           'form': form})
 
 def TagsList(request, tag):
     data = QuestionTag.objects.get_questions_per_tag(tag)
     pagination = paginations_params(request, data, 5)
     page_objects = pagination.get("page_objects")
-    questions = questions_list_tags(page_objects)
+    questions = get_tags_per_question(page_objects)
     return render(request,
                   'TagsList.html',
                   context={'tag': tag,
                            'pagination_params': pagination.get("params"),
                            'questions': questions})
-
+@login_required
 def AddQuestion(request):
-    return render(request,
-                  'AddQuestion.html',
-                  context={'questions': QUESTIONS})
+    if request.method == 'POST':
+        form = AddQuestionForm(request.POST)
+        if form.is_valid():
+            question = form.save(commit=True, author=request.user)
+            return redirect('QuestionSingle', question_id=question.id)
+    else:
+        form = AddQuestionForm()
+
+    return render(request, 'AddQuestion.html', context={'form': form})

@@ -31,7 +31,7 @@
             </form>
             <div class="my-2 d-flex gap-1">
                 {% if request.user.is_authenticated %}
-                    <div class="d-flex gap-1 ">
+                    <div class="d-flex gap-1 align-items-center">
                         <img src="{% static '/pictures/cat1.jpeg' %}" alt="Avatar" class="img-thumbnail"
                              style="width: 38px; height: 38px; padding: 0">
                         <div>
@@ -67,11 +67,11 @@
                 <h2>Best Members</h2>
                 <div>
                     <ul class="list-group list-group-flush">
-                        <li class="list-group-item"><a href="#">Member</a></li>
-                        <li class="list-group-item"><a href="#">Member</a></li>
-                        <li class="list-group-item"><a href="#">Member</a></li>
-                        <li class="list-group-item"><a href="#">Member</a></li>
-                        <li class="list-group-item"><a href="#">Member</a></li>
+                        {% for person in popular_persons %}
+                            <li class="list-group-item">
+                                <a href="#" style="text-decoration: none;">{{ person.username }}</a>
+                            </li>
+                        {% endfor %}
                     </ul>
                 </div>
             </section>

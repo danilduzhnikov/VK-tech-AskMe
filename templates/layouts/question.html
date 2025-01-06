@@ -10,7 +10,7 @@
                placeholder="Default input" aria-label="default-input-example">
     </div>
     <div class="col-9 d-flex flex-column gap-2">
-        <a href="{% url 'QuestionSingle' item.question.id %}">
+        <a href="{% url 'QuestionSingle' item.question.id %}" style="text-decoration: none;">
             <h5>{{ item.question.title }}</h5>
         </a>
         <p class="card-text">{{ item.question.text }}
@@ -21,7 +21,7 @@
                 Tags:
 
                     {% for tag in item.tags %}
-                        <a href="/tag/{{ tag.name }}" class="ms-1">{{ tag.name }}</a>
+                        <a href="/tag/{{ tag.name }}" class="ms-1" style="text-decoration: none;" >{{ tag.name }}</a>
                     {% endfor %}
 
             </div>

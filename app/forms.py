@@ -1,8 +1,9 @@
+import re
 from django import forms
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 
-from app.models import CustomUser
+from app.models import CustomUser, Question, Tag, QuestionTag, Answer
 
 User = get_user_model()
 
@@ -61,6 +62,7 @@ class RegisterForm(forms.ModelForm):
     class Meta:
         model = CustomUser
         fields = ['login', 'email', 'username', 'password']
+
     def clean_login(self):
         login = self.cleaned_data.get('login')
         user = User.objects.filter(username=login).first()
@@ -101,3 +103,102 @@ class RegisterForm(forms.ModelForm):
         user.set_password(self.cleaned_data['password'])
         user.save()
         return user
+
+class AddQuestionForm(forms.ModelForm):
+    title = forms.CharField(
+        label="Title",
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Enter a question title',
+            'maxlength': 100,
+        })
+    )
+    text = forms.CharField(
+        label="Some text",
+        widget=forms.Textarea(attrs={
+            'class': 'form-control',
+            'placeholder': 'Describe your question',
+            'rows': 5,
+        })
+    )
+    tags = forms.CharField(
+        label="Tags",
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Enter tags separated by commas (for example: Apple, Tree)',
+        }),
+        required=False
+    )
+
+    class Meta:
+        model = Question
+        fields = ['title', 'text', 'tags']
+
+    def clean_title(self):
+        title = self.cleaned_data.get('title')
+        if not title:
+            self.add_error('title', 'Title cannot be empty.')
+
+        question = Question.objects.filter(title=title).first()
+        if question:
+            self.add_error('title', 'This title is already exists.')
+        else:
+            return title
+
+    def clean_text(self):
+        text = self.cleaned_data.get('text')
+        if not text:
+            self.add_error('text', 'This text is required.')
+        else:
+            return text
+
+    def clean_tags(self):
+        tags = self.cleaned_data.get('tags')
+        return tags
+
+    def save(self, commit=True, author=None):
+        question = super().save(commit=False)
+        if author:
+            question.author = author
+        if commit:
+            question.save()
+
+        tags = self.cleaned_data.get('tags', '')
+        if tags:
+            tag_names = [tag.strip() for tag in tags.split(',') if tag.strip()]
+            for tag_name in tag_names:
+                tag, created = Tag.objects.get_or_create(name=tag_name)
+                QuestionTag.objects.get_or_create(question=question, tag=tag)
+
+        return question
+
+class AddAnswerForm(forms.ModelForm):
+    text = forms.CharField(
+        label="",
+        widget=forms.Textarea(attrs={
+            'class': 'form-control',
+            'placeholder': 'Enter your answer here..',
+            'rows': 2,
+        }),
+        required=False
+    )
+
+    class Meta:
+        model = Answer
+        fields = ['text']
+
+    def clean_text(self):
+        text = self.cleaned_data.get('text')
+        if not text:
+            self.add_error('text', 'Answer cannot be empty.')
+        return text
+
+    def save(self, commit=True, author=None, question=None):
+        answer = super().save(commit=False)
+        if author:
+            answer.author = author
+        if question:
+            answer.question = question
+        if commit:
+            answer.save()
+        return answer
