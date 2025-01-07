@@ -8,6 +8,12 @@ from django.conf import settings
 
 T = TypeVar('T')
 
+class CustomUser(AbstractUser):
+    login = models.CharField(max_length=150, unique=True)
+
+    def __str__(self):
+        return self.username
+
 class TagsManager(Generic[T], models.Manager):
     def get_popular(self):
         return self.order_by('-views')[:8].values_list('name', flat=True)
@@ -23,6 +29,8 @@ class QuestionManager(Generic[T], models.Manager):
         return self.order_by('-views')
 
 class QuestionLikeManager(Generic[T], models.Manager):
+    def is_user_liked_question(self, user: CustomUser, question_id: int) -> bool:
+        return self.filter(user=user, question_id=question_id).exists()
     def get_count_likes_question(self, question_id: int) -> int:
         likes = self.filter(question=question_id)
         return likes.count()
@@ -44,13 +52,6 @@ class QuestionTagManager(Generic[T], models.Manager):
         return Question.objects.filter(
             questiontag__tag__name=tag
         ).distinct()
-
-class CustomUser(AbstractUser):
-    login = models.CharField(max_length=150, unique=True)
-
-    def __str__(self):
-        return self.username
-
 
 class Profile(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)

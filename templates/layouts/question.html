@@ -1,29 +1,35 @@
 {% load static %}
 
-<div class="row">
+<div class="row question" data-question-id="{{ item.question.id }}">
     <div class="col-3 d-flex flex-column">
         <div class="border mb-2" style="height: 100px">
             <img src="{% static '/pictures/cat1.jpeg' %}" alt="Avatar" class="img-thumbnail"
                  style="width: 100%; height: 100%; padding: 0; object-fit: cover">
         </div>
-        <input type="number" class="form-control" style="width: 100%;" value="5"
-               placeholder="Default input" aria-label="default-input-example">
+        <section class="d-flex align-items-center">
+            <button class="btn like-button" style="background: none; border: none; padding: 0; cursor: pointer;">
+                {% if item.is_liked %}
+                    <i class="fas fa-heart" aria-hidden="true" style="font-size: 24px; color:red;"
+                   data-liked="true"></i>
+                {% else %}
+                    <i class="fas fa-heart" aria-hidden="false" style="font-size: 24px; color:lightgray;"
+                   data-liked="false"></i>
+                {% endif %}
+            </button>
+            <span class="like-counter ms-2">{{ item.likes_count }}</span>
+        </section>
     </div>
     <div class="col-9 d-flex flex-column gap-2">
         <a href="{% url 'QuestionSingle' item.question.id %}" style="text-decoration: none;">
             <h5>{{ item.question.title }}</h5>
         </a>
-        <p class="card-text">{{ item.question.text }}
-        </p>
+        <p class="card-text">{{ item.question.text }}</p>
         <div class="d-flex gap-5">
             <div>
-
                 Tags:
-
-                    {% for tag in item.tags %}
-                        <a href="/tag/{{ tag.name }}" class="ms-1" style="text-decoration: none;" >{{ tag.name }}</a>
-                    {% endfor %}
-
+                {% for tag in item.tags %}
+                    <a href="/tag/{{ tag.name }}" class="ms-1" style="text-decoration: none;">{{ tag.name }}</a>
+                {% endfor %}
             </div>
         </div>
     </div>

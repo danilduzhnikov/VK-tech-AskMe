@@ -1,7 +1,7 @@
 # app/urls.py
 
 from django.urls import path
-from .views import QuestionsList, HotQuestions, TagsList, QuestionSingle, Login, Register, AddQuestion, Settings, Logout
+from .views import QuestionsList, HotQuestions, TagsList, QuestionSingle, Login, Register, AddQuestion, Settings, Logout, LikeAsync
 
 urlpatterns = [
     path('', QuestionsList, name='QuestionsList'),
@@ -13,4 +13,6 @@ urlpatterns = [
     path('ask/', AddQuestion, name='AddQuestion'),
     path('settings/', Settings, name='Settings'),
     path('logout/', Logout, name='Logout'),
+
+    path('<int:question_id>/like_async', LikeAsync, name='LikeAsync'),
 ]
