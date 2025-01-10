@@ -34,7 +34,7 @@
             <div class="my-2 d-flex gap-1">
                 {% if request.user.is_authenticated %}
                     <div class="d-flex gap-1 align-items-center">
-                        <img src="{% static '/pictures/cat1.jpeg' %}" alt="Avatar" class="img-thumbnail"
+                        <img src="{{ request.user.profile.avatar.url }}" alt="Avatar" class="img-thumbnail"
                              style="width: 38px; height: 38px; padding: 0">
                         <div>
                             <a class="btn btn-outline-primary" href=" {% url 'Settings' %} ">settings</a>

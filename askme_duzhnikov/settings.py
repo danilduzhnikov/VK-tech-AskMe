@@ -133,13 +133,16 @@ STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
 
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+MEDIA_URL = '/media/'
+
 LOGIN_URL = '/login'
 
 AUTH_USER_MODEL = 'app.CustomUser'
 
 AUTHENTICATION_BACKENDS = [
     'askme_duzhnikov.authentication.CustomLoginBackend',
-    'django.contrib.auth.backends.ModelBackend',
 ]
 
 # Default primary key field type

@@ -41,24 +41,25 @@ class Command(BaseCommand):
         created_users = User.objects.exclude(profile__isnull=False)  # Пользователи без профилей
         self.stdout.write(f"Создано {created_users.count()} пользователей.")
 
-        # Создаем профили только для этих пользователей
-        user_Profile = [
-            Profile(user=user, description=fake.text(max_nb_chars=50))
-            for user in created_users
-        ]
-        Profile.objects.bulk_create(user_Profile)
-        self.stdout.write(f"Создано {len(user_Profile)} профилей пользователей.")
-
-        # Генерация тегов
-        num_Tag = ratio
+        # Получаем существующие имена тегов из базы данных
         existing_tags = set(Tag.objects.values_list('name', flat=True))
-        new_tags = [
-            Tag(name=fake.word(), views=randint(0, 1000))
-            for _ in range(num_Tag)
-            if fake.word() not in existing_tags
-        ]
+
+        # Генерация новых уникальных тегов
+        new_tags = []
+        num_tags = 0
+
+        while num_tags < ratio:
+            # Генерация случайного слова
+            tag_name = fake.word()
+
+            # Если слово уже существует, генерируем новое
+            if tag_name not in existing_tags:
+                new_tags.append(Tag(name=tag_name, views=randint(0, 1000)))
+                existing_tags.add(tag_name)  # Добавляем в существующие имена, чтобы избежать повторений
+                num_tags += 1
+
         Tag.objects.bulk_create(new_tags)
-        self.stdout.write(f"Создано {len(new_tags)} новых тегов.")
+        self.stdout.write(f"Создано {len(new_tags)} вопросов.")
 
         # Генерация вопросов
         num_Question = ratio * 10

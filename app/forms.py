@@ -2,8 +2,9 @@ import re
 from django import forms
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
+from django.db.models.signals import post_save
 
-from app.models import CustomUser, Question, Tag, QuestionTag, Answer
+from app.models import CustomUser, Question, Tag, QuestionTag, Answer, Profile
 
 User = get_user_model()
 
@@ -58,9 +59,13 @@ class RegisterForm(forms.ModelForm):
     repeat_password = forms.CharField(
         widget=forms.PasswordInput(attrs={'class': 'form-control'})
     )
+    avatar = forms.ImageField(
+        required=False,
+        widget=forms.FileInput(attrs={'class': 'form-control'})
+    )
 
     class Meta:
-        model = CustomUser
+        model = User
         fields = ['login', 'email', 'username', 'password']
 
     def clean_login(self):
@@ -101,7 +106,13 @@ class RegisterForm(forms.ModelForm):
     def save(self, commit=True):
         user = super().save(commit=False)
         user.set_password(self.cleaned_data['password'])
-        user.save()
+        if commit:
+            user.save()
+            avatar = self.cleaned_data.get('avatar')
+            if avatar:
+                Profile.objects.create(user=user, avatar=avatar)
+            else:
+                Profile.objects.create(user=user)
         return user
 
 class AddQuestionForm(forms.ModelForm):

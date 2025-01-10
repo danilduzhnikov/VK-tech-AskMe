@@ -22,20 +22,22 @@ for (const question of questions) {
     const questionId = question.dataset.questionId;
 
     likeButton.addEventListener('click', () => {
-        const isLiked = heartIcon.getAttribute('data-liked') === 'true';
+        const isLiked = heartIcon.getAttribute('data-is-liked') === 'true';
         const request = new Request(`${questionId}/like_async`, {
             method: "POST",
             headers: {'X-CSRFToken': getCookie('csrftoken')},
             mode: 'same-origin',
-            body: JSON.stringify({ liked: !isLiked }) // Отправляем новый статус
         });
 
         fetch(request)
-            .then(response => response.json())
+            .then(response => {
+                return response.json();
+            })
             .then(data => {
-                likeCounter.textContent = data.likes_count;
-                heartIcon.style.color = data.is_liked ? 'red' : 'lightgray';
-                heartIcon.setAttribute('data-liked', data.is_liked.toString());
+                if (data) {
+                    likeCounter.textContent = data.likes_count;
+                    heartIcon.style.color = data.is_liked === 'true' ? 'red' : 'lightgray';
+                }
             })
             .catch(error => console.error('Error:', error));
     });

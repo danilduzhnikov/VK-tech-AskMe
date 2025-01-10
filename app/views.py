@@ -38,7 +38,7 @@ def Logout(request):
     return redirect('Login')
 
 def Register(request):
-    form = RegisterForm(request.POST or None)
+    form = RegisterForm(request.POST or None, request.FILES or None)
     if form.is_valid():
         user = form.save(commit=True)
         auth.login(request, user)
@@ -58,7 +58,7 @@ def QuestionsList(request):
     data = QUESTIONS
     pagination = paginations_params(request, data, 5)
     page_objects = pagination.get("page_objects")
-    questions = get_tags_per_question(page_objects)
+    questions = get_tags_per_question(page_objects, request.user)
     return render(request,
                   'QuestionsList.html',
                   context={'pagination_params': pagination.get("params"),
@@ -118,15 +118,14 @@ def AddQuestion(request):
         form = AddQuestionForm()
 
     return render(request, 'AddQuestion.html', context={'form': form})
-
+@login_required
 def LikeAsync(request, question_id):
-    if request.user.is_authenticated:
         likesCount = QuestionLike.objects.get_count_likes_question(question_id)
         if QuestionLike.objects.is_user_liked_question(request.user, question_id):
             QuestionLike.objects.filter(user=request.user, question_id=question_id).delete()
-            return JsonResponse({'likes_count': f"{likesCount - 1}"})
+            return JsonResponse({'likes_count': f"{likesCount - 1}",
+                                 'is_liked': 'false'})
         else:
             QuestionLike.objects.create(user=request.user, question_id=question_id)
-            return JsonResponse({'likes_count': f"{likesCount + 1}"})
-    else:
-        return redirect('Login')
+            return JsonResponse({'likes_count': f"{likesCount + 1}",
+                                 'is_liked': 'true'})

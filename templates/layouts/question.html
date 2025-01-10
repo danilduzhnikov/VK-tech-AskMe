@@ -8,15 +8,9 @@
         </div>
         <section class="d-flex align-items-center">
             <button class="btn like-button" style="background: none; border: none; padding: 0; cursor: pointer;">
-                {% if item.is_liked %}
-                    <i class="fas fa-heart" aria-hidden="true" style="font-size: 24px; color:red;"
-                   data-liked="true"></i>
-                {% else %}
-                    <i class="fas fa-heart" aria-hidden="false" style="font-size: 24px; color:lightgray;"
-                   data-liked="false"></i>
-                {% endif %}
+                <i class="fas fa-heart" data-is-liked="{{ item.is_liked }}" style="font-size: 24px; color: {% if item.is_liked %}red{% else %}lightgray{% endif %};"></i>
+                <span class="like-counter ms-2">{{ item.likes_count }}</span>
             </button>
-            <span class="like-counter ms-2">{{ item.likes_count }}</span>
         </section>
     </div>
     <div class="col-9 d-flex flex-column gap-2">

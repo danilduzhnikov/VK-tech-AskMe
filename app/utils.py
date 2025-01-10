@@ -127,13 +127,12 @@ def get_tags_per_question(questions, user=None):
         # Если пользователя нет, ставим для всех вопросов "is_liked" как "false"
         user_likes_dict = {question_id: False for question_id in question_ids}
 
-    # Формируем список словарей с результатами
     question_tags = [
         {
             'question': question,
             'tags': [tags_dict[tag_id] for tag_id in tags_by_question_id.get(question.id, [])],
-            'likes_count': likes_dict.get(question.id, 0),  # Если лайков нет, подставляем 0
-            'is_liked': 'true' if user_likes_dict.get(question.id, False) else 'false'
+            'likes_count': likes_dict.get(question.id, 0),
+            'is_liked': True if user_likes_dict.get(question.id, False) else False
         }
         for question in questions
     ]

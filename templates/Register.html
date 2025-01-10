@@ -12,7 +12,7 @@
 
 {% block content %}
     <div class="col-9 d-flex flex-column gap-2" style="height: 70vh;">
-        <form action="#" method="POST" class="d-flex flex-column gap-2 h-100">
+        <form action="#" method="POST" enctype="multipart/form-data" class="d-flex flex-column gap-2 h-100">
             {% csrf_token %}
             {% bootstrap_form form %}
             {% buttons %}
