@@ -75,7 +75,7 @@ class Tag(models.Model):
 
 class Question(models.Model):
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    avatar = models.ImageField(upload_to='questions_avatars/', null=True, blank=True)
+    avatar = models.ImageField(upload_to='questions_avatars/', null=True, blank=True, default='questions_avatars/default.jpg')
     title = models.CharField(max_length=100)
     text = models.TextField()
     views = models.IntegerField(default=0)
@@ -100,6 +100,7 @@ class Answer(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     text = models.TextField()
+    is_correct = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

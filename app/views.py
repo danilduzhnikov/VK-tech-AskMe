@@ -1,11 +1,13 @@
 import copy
+import json
 
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
+from django.views.decorators.http import require_http_methods
 
-from app.forms import LoginForm, RegisterForm, AddQuestionForm, AddAnswerForm
+from app.forms import LoginForm, RegisterForm, AddQuestionForm, AddAnswerForm, SettingsForm
 from app.utils import paginations_params, get_tags_per_question
 
 from app.models import Tag, Question, QuestionTag, QuestionLike
@@ -50,9 +52,14 @@ def Register(request):
                            'form': form})
 @login_required
 def Settings(request):
+    form = SettingsForm(request.POST or None, request.FILES or None)
+
+    if form.is_valid():
+        form.save(author=request.user)
+
     return render(request,
                   'Settings.html',
-                  context={'questions': QUESTIONS})
+                  context={'form': form})
 
 def QuestionsList(request):
     data = QUESTIONS
@@ -109,13 +116,12 @@ def TagsList(request, tag):
                            'questions': questions})
 @login_required
 def AddQuestion(request):
-    if request.method == 'POST':
-        form = AddQuestionForm(request.POST)
-        if form.is_valid():
-            question = form.save(commit=True, author=request.user)
-            return redirect('QuestionSingle', question_id=question.id)
-    else:
-        form = AddQuestionForm()
+    form = AddQuestionForm(request.POST or None, request.FILES or None)
+    if form.is_valid():
+        question = form.save(commit=True, author=request.user)
+        return redirect('QuestionSingle', question_id=question.id)
+    return render(request, 'AddQuestion.html',
+                  context={'form': form})
 
     return render(request, 'AddQuestion.html', context={'form': form})
 @login_required

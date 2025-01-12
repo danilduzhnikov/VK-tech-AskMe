@@ -25,29 +25,40 @@
 <body>
 <nav class="navbar navbar-light" style="background-color: #e3f2fd;">
     <div class="container-fluid">
-        <div class="d-flex w-100 justify-content-between align-items-center">
-            <a class="navbar-brand" style="font-weight: bold;" href="{% url 'QuestionsList' %}">AskDuzhnikov</a>
-            <form class="form-inline my-2 my-lg-0 d-flex gap-1">
-                <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-                <button class="btn btn-outline-primary my-2 my-sm-0" type="submit">Ask</button>
+        <div class="d-flex w-100 justify-content-between align-items-center flex-wrap">
+            <!-- Логотип и меню -->
+            <div class="d-flex align-items-center flex-wrap">
+                <a class="navbar-brand fw-bold" href="{% url 'QuestionsList' %}">AskDuzhnikov</a>
+                <ul class="navbar-nav flex-row me-auto mb-2 mb-lg-0 gap-2">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="{% url 'AddQuestion' %}">Add question</a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Форма поиска -->
+            <form class="form-inline d-flex gap-2 my-2 my-lg-0 mx-auto">
+                <input class="form-control" type="search" placeholder="Search" aria-label="Search">
+                <button class="btn btn-outline-primary" type="submit">Ask</button>
             </form>
-            <div class="my-2 d-flex gap-1">
+
+            <!-- Блок пользователя -->
+            <div class="d-flex align-items-center gap-2 my-2">
                 {% if request.user.is_authenticated %}
-                    <div class="d-flex gap-1 align-items-center">
+                    <div class="d-flex align-items-center gap-2">
                         <img src="{{ request.user.profile.avatar.url }}" alt="Avatar" class="img-thumbnail"
-                             style="width: 38px; height: 38px; padding: 0">
-                        <div>
-                            <a class="btn btn-outline-primary" href=" {% url 'Settings' %} ">settings</a>
-                            <a class="btn btn-outline-primary" href=" {% url 'Logout' %} ">log out</a>
+                             style="width: 38px; height: 38px; padding: 0; object-fit: cover;">
+                        <div class="d-flex gap-2">
+                            <a class="btn btn-outline-primary" href="{% url 'Settings' %}">Settings</a>
+                            <a class="btn btn-outline-primary" href="{% url 'Logout' %}">Log out</a>
                         </div>
                     </div>
                 {% else %}
-                    <a class="btn btn-outline-primary my-2 my-sm-0" href="/signup/" role="button">Sign in</a>
+                    <a class="btn btn-outline-primary" href="/signup/" role="button">Sign in</a>
                     <a class="btn btn-outline-primary" href="/login/" role="button">Log in</a>
                 {% endif %}
             </div>
         </div>
-    </div>
     </div>
 </nav>
 <main class="container mt-5">
@@ -56,36 +67,32 @@
     <div class="row mt-5">
         {% block content %}
         {% endblock %}
-        <div class="col-3">
-            <section class="mb-3">
+        <!-- Левая или правая колонка -->
+        <aside class="col-12 col-md-3">
+            <!-- Секция популярных тегов -->
+            <section class="mb-4">
                 <h2>Popular Tags</h2>
-                <div class="d-flex gap-1" style="width: 270px; flex-wrap: wrap;">
+                <div class="d-flex gap-1 flex-wrap" style="max-width: 270px;">
                     {% for tag in popular_tags %}
                         {% include "layouts/tag.html" %}
                     {% endfor %}
                 </div>
             </section>
+            <!-- Секция лучших участников -->
             <section>
                 <h2>Best Members</h2>
-                <div>
-                    <ul class="list-group list-group-flush">
-                        {% for person in popular_persons %}
-                            <li class="list-group-item">
-                                <a href="#" style="text-decoration: none;">{{ person.username }}</a>
-                            </li>
-                        {% endfor %}
-                    </ul>
-                </div>
+                <ul class="list-group list-group-flush">
+                    {% for person in popular_persons %}
+                        <li class="list-group-item">
+                            <a href="#" class="text-decoration-none">{{ person.username }}</a>
+                        </li>
+                    {% endfor %}
+                </ul>
             </section>
-        </div>
+        </aside>
     </div>
 </main>
-<script src="{% static 'js/bootstrap.min.js' %}">
-    function displayFilePath() {
-        const fileInput = document.getElementById("file-upload");
-        const filePath = document.getElementById("file-path");
-        filePath.value = fileInput.files[0]?.name || ""; // Отображает только имя файла
-    }
-</script>
+<script src="{% static 'js/bootstrap.min.js' %}"></script>
 <script src="{% static 'js/app.js' %}"></script>
 </body>
+</html>

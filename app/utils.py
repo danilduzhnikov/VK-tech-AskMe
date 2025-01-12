@@ -1,5 +1,5 @@
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
-from app.models import QuestionTag, Tag, QuestionLike
+from app.models import QuestionTag, Tag, QuestionLike, Answer
 from django.db.models import Count
 
 # Стартовые свойства пагинатора
@@ -82,7 +82,7 @@ def get_tags_per_question(questions, user=None):
 
     :param questions: Список или одиночный вопрос (объект Question).
     :param user: Пользователь, для которого проверяется, лайкал ли вопрос.
-    :return: Список словарей с информацией о вопросах, тегах, лайках и лайкнул ли пользователь вопрос.
+    :return: Список словарей с информацией о вопросах, тегах, лайках, комментариях и лайкнул ли пользователь вопрос.
     """
     if not isinstance(questions, list):
         questions = [questions]
@@ -97,8 +97,8 @@ def get_tags_per_question(questions, user=None):
     tags_by_question_id = {}
     for record in question_tag_records:
         if record.question_id not in tags_by_question_id:
-            tags_by_question_id[record.question_id] = []
-        tags_by_question_id[record.question_id].append(record.tag_id)
+            tags_by_question_id[record.question_id] = set()  # Используем set для устранения дубликатов
+        tags_by_question_id[record.question_id].add(record.tag_id)
 
     # Извлекаем все уникальные теги одним запросом
     tag_ids = set(tag_id for tag_list in tags_by_question_id.values() for tag_id in tag_list)
@@ -130,8 +130,9 @@ def get_tags_per_question(questions, user=None):
     question_tags = [
         {
             'question': question,
-            'tags': [tags_dict[tag_id] for tag_id in tags_by_question_id.get(question.id, [])],
+            'tags': [tags_dict[tag_id] for tag_id in tags_by_question_id.get(question.id, set())],
             'likes_count': likes_dict.get(question.id, 0),
+            'comments_count': Answer.objects.filter(question_id=question.id).count(),
             'is_liked': True if user_likes_dict.get(question.id, False) else False
         }
         for question in questions
@@ -145,12 +146,14 @@ def get_tags_per_question(questions, user=None):
 #         'question': <Question 1>,
 #         'tags': [<Tag 1>, <Tag 2>],
 #         'likes_count': 5,
+#         'comments_count': 10,
 #         'is_liked': True
 #     },
 #     {
 #         'question': <Question 2>,
 #         'tags': [<Tag 3>],
 #         'likes_count': 0,
+#         'comments_count': 12,
 #         'is_liked': False
 #     }
 # ]

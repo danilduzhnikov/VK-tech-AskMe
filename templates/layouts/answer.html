@@ -18,7 +18,7 @@
                         {{ answer.created_at }}
                     </a>
                     <a>
-                        <img src="{% static '/pictures/cat1.jpeg' %}" alt="Avatar" class="img-thumbnail"
+                        <img src="{{ answer.author.avatar.url }}" alt="Avatar" class="img-thumbnail"
                              style="width: 38px; height: 38px; padding: 0">
                         {{ answer.author.username }}
                     </a>

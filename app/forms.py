@@ -2,11 +2,14 @@ import re
 from django import forms
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
-from django.db.models.signals import post_save
 
-from app.models import CustomUser, Question, Tag, QuestionTag, Answer, Profile
+from app.models import Question, Tag, QuestionTag, Answer, Profile
 
 User = get_user_model()
+
+# I understand that the validation of the mail login and username
+# can be placed in a separate validation block to reduce the code, but now
+# I’m not in the mood for that
 
 class LoginForm(forms.Form):
     login = forms.CharField(
@@ -43,6 +46,78 @@ class LoginForm(forms.Form):
                 pass
 
         return cleaned_data
+
+class SettingsForm(forms.Form):
+    login = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+    email = forms.EmailField(
+        required=False,
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+    username = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+    avatar = forms.ImageField(
+        required=False,
+        widget=forms.FileInput(attrs={'class': 'form-control'})
+    )
+    class Meta:
+        model = User
+        fields = ['login', 'email', 'username']
+
+    def clean_login(self):
+        login = self.cleaned_data.get('login')
+        if login:
+            user = User.objects.filter(username=login).first()
+            if user:
+                raise ValidationError("This login is already registered.")
+            return login
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if email:
+            user = User.objects.filter(email=email).first()
+            if user:
+                raise ValidationError("This email is already registered.")
+
+            return email
+
+    def clean_username(self):
+        username = self.cleaned_data.get('username')
+        if username:
+            user = User.objects.filter(username=username).first()
+            if user:
+                raise ValidationError("This username is already registered.")
+
+            return username
+
+    def save(self, author, commit=True):
+        """
+            Сохраняет обновлённые данные пользователя и его профиля (аватар).
+        """
+        # Обновляем данные пользователя
+        if self.cleaned_data.get('login'):
+            author.login = self.cleaned_data['login']
+        if self.cleaned_data.get('email'):
+            author.email = self.cleaned_data['email']
+        if self.cleaned_data.get('username'):
+            author.username = self.cleaned_data['username']
+
+        avatar = self.cleaned_data.get('avatar')
+        profile = author.profile
+        if avatar:
+            profile.avatar = avatar
+        if commit:
+            profile.save()
+
+        if commit:
+            author.save()
+
+        return author
+
 class RegisterForm(forms.ModelForm):
     login = forms.CharField(
         widget=forms.TextInput(attrs={'class': 'form-control'})
@@ -84,11 +159,11 @@ class RegisterForm(forms.ModelForm):
 
         return email
 
-    def clean_nickname(self):
+    def clean_username(self):
         username = self.cleaned_data.get('username')
         user = User.objects.filter(nickname=username).first()
         if user:
-            raise ValidationError("This nickname is already registered.")
+            raise ValidationError("This username is already registered.")
 
         return username
 
@@ -140,6 +215,10 @@ class AddQuestionForm(forms.ModelForm):
         }),
         required=False
     )
+    avatar = forms.ImageField(
+        required=False,
+        widget=forms.FileInput(attrs={'class': 'form-control'})
+    )
 
     class Meta:
         model = Question
@@ -171,6 +250,11 @@ class AddQuestionForm(forms.ModelForm):
         question = super().save(commit=False)
         if author:
             question.author = author
+        print(1)
+        avatar = self.cleaned_data.get('avatar')
+        if avatar:
+            print(2)
+            question.avatar = avatar
         if commit:
             question.save()
 
