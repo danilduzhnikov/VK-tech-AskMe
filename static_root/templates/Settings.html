@@ -1,0 +1,25 @@
+{% extends 'layouts/layouts/base.html' %}
+{% load static %}
+{% load bootstrap5 %}
+
+{% block title %}
+    <title>Settings</title>
+{% endblock %}
+
+{% block content_name %}
+    <h1>Settings: {{ request.user.username }}</h1>
+{% endblock %}
+
+{% block content %}
+    <div class="col-9 d-flex flex-column gap-2" style="height: 70vh;">
+        <form action="#" method="POST" enctype="multipart/form-data" class="d-flex flex-column gap-2 h-100">
+            {% csrf_token %}
+            {% bootstrap_form form %}
+            {% buttons %}
+                <button class="btn btn-outline-primary my-2 my-sm-0" type="submit">Save</button>
+            {% endbuttons %}
+        </form>
+    </div>
+{% endblock %}
+
+
