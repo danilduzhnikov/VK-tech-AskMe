@@ -41,7 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'app',
-    'bootstrap5'
+    'django_bootstrap5',
 ]
 
 MIDDLEWARE = [
@@ -85,11 +85,11 @@ WSGI_APPLICATION = 'askme_duzhnikov.wsgi.application'
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": env("DB_NAME"),
-        "USER": env("DB_USER"),
-        "PASSWORD": env("DB_PASSWORD"),
+        "NAME": "askme_db",
+        "USER": "postgres",
+        "PASSWORD": "qwe123",
         "HOST": "127.0.0.1",
-        "PORT": "5432",
+        "PORT": "5435",
     }
 }
 
@@ -143,6 +143,7 @@ AUTH_USER_MODEL = 'app.CustomUser'
 
 AUTHENTICATION_BACKENDS = [
     'askme_duzhnikov.authentication.CustomLoginBackend',
+    'django.contrib.auth.backends.ModelBackend',
 ]
 
 # Default primary key field type

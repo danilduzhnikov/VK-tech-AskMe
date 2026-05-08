@@ -1,6 +1,6 @@
 {% extends 'layouts/base.html' %}
 {% load static %}
-{% load bootstrap5 %}
+{% load django_bootstrap5 %}
 
 {% block title %}
     <title>Question</title>
@@ -24,9 +24,7 @@
         <form action="#" method="POST" class="d-flex flex-column gap-2 h-100">
             {% csrf_token %}
             {% bootstrap_form form %}
-            {% buttons %}
-                <button class="btn btn-outline-primary my-2 my-sm-0" type="submit">Answer</button>
-            {% endbuttons %}
+            <button class="btn btn-outline-primary my-2 my-sm-0" type="submit">Answer</button>
         </form>
     </div>
 {% endblock %}

@@ -161,7 +161,7 @@ class RegisterForm(forms.ModelForm):
 
     def clean_username(self):
         username = self.cleaned_data.get('username')
-        user = User.objects.filter(nickname=username).first()
+        user = User.objects.filter(username=username).first()
         if user:
             raise ValidationError("This username is already registered.")
 

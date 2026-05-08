@@ -1,6 +1,6 @@
 {% extends 'layouts/layouts/base.html' %}
 {% load static %}
-{% load bootstrap5 %}
+{% load django_bootstrap5 %}
 
 {% block title %}
     <title>Login</title>
@@ -16,15 +16,10 @@
             <div class="col-9 d-flex flex-column gap-2" style="height: 70vh;">
                 <form action="" method="POST" class="d-flex flex-column gap-2 h-100">
                     {% csrf_token %}
-                    {% bootstrap_form form%}
-                    {% buttons %}
-                        <button class="btn btn-outline-primary my-2 my-sm-0" type="submit">Log in!</button>
-                    {% endbuttons %}
+                    {% bootstrap_form form %}
+                    <button class="btn btn-outline-primary my-2 my-sm-0" type="submit">Log in!</button>
                 </form>
             </div>
         </div>
     </div>
 {% endblock %}
-
-
-
