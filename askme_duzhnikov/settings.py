@@ -85,11 +85,11 @@ WSGI_APPLICATION = 'askme_duzhnikov.wsgi.application'
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "askme_db",
-        "USER": "postgres",
-        "PASSWORD": "qwe123",
-        "HOST": "127.0.0.1",
-        "PORT": "5435",
+        "NAME": env("DB_NAME"),
+        "USER": env("DB_USER"),
+        "PASSWORD": env("DB_PASSWORD"),
+        "HOST": env("DB_HOST"),
+        "PORT": env("DB_PORT"),
     }
 }
 
